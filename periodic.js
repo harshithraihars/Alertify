@@ -8,7 +8,7 @@ const checkPriceDrop = (product) => {
     const islocal=process.env.CHROME_EXECUTABLE_PATH
     // connecting to the browser
     const browser = await puppeteer.launch({
-      args: islocal?puppeteer.defaultArgs():[...chromium.args(),'--hide-scrollbars','--incognito','--no-sandbox'],
+      args: islocal?puppeteer.defaultArgs():[...chromium.args,'--hide-scrollbars','--incognito','--no-sandbox'],
       defaultViewport: chromium.defaultViewport,
       executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath('https://my-media-assets.s3.amazonaws.com/chromium-v126.0.0-pack.tar'),
       headless: chromium.headless,
