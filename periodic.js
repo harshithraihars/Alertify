@@ -82,9 +82,9 @@ const productModel = require("./Schema/productSchema");
 const checkPriceDrop = (product) => {
   
   (async () => {
-    console.log("Using Puppeteer version:", puppeteer.version());
     console.log("Chromium executable path:", puppeteer.executablePath());
     // connecting to the browser
+    const executablePath = "/usr/bin/google-chrome-stable";
     const browser = await puppeteer.launch({
       args: [
         "--disable-setuid-sandbox",
@@ -92,7 +92,8 @@ const checkPriceDrop = (product) => {
         "--single-process",
         "--no-zygote"
       ],
-      executablePath:puppeteer.executablePath()
+      // executablePath:puppeteer.executablePath()
+      executablePath:executablePath
     });
   
     const page = await browser.newPage();
