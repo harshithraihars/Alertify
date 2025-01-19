@@ -85,6 +85,12 @@ const checkPriceDrop = (product) => {
     console.log('Puppeteer executable path:', puppeteer.executablePath());
     // connecting to the browser
     const browser = await puppeteer.launch({
+      args: [
+        "--disable-setuid-sandbox",
+        "--no-sandbox",
+        "--single-process",
+        "--no-zygote"
+      ],
       executablePath:puppeteer.executablePath()
     });
   
