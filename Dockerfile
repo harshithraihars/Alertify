@@ -1,7 +1,6 @@
 # Use the Puppeteer base image with Chromium pre-installed
 FROM ghcr.io/puppeteer/puppeteer:24.1.0
 
-apt-get install -y google-chrome-stable
 # Set environment variables for Puppeteer
 ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
 ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
