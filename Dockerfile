@@ -1,14 +1,25 @@
+# Use the Puppeteer base image with Chromium pre-installed
 FROM ghcr.io/puppeteer/puppeteer:24.1.0
 
-ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true \
-    PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
+# Set environment variables for Puppeteer
+ENV PUPPETEER_SKIP_CHROMIUM_DOWNLOAD=true
+ENV PUPPETEER_EXECUTABLE_PATH=/usr/bin/google-chrome-stable
 
-# Copy and install dependencies
+# Set the working directory
+WORKDIR /app
+
+# Copy application files
 COPY package*.json ./
+
+# Install dependencies
 RUN npm ci
 
-# Copy all project files
+# Copy the rest of the application code
 COPY . .
 
-# Default command to run your script
+# Expose the port your app runs on
+EXPOSE 3000
+
+# Command to run your application
 CMD ["node", "scrapper.js"]
+
