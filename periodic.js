@@ -82,7 +82,8 @@ const productModel = require("./Schema/productSchema");
 const checkPriceDrop = (product) => {
   
   (async () => {
-    console.log('Puppeteer executable path:', puppeteer.executablePath());
+    console.log("Using Puppeteer version:", puppeteer.version());
+    console.log("Chromium executable path:", puppeteer.executablePath());
     // connecting to the browser
     const browser = await puppeteer.launch({
       args: [
