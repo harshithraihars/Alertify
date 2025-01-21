@@ -76,24 +76,31 @@
 
 const puppeteer = require("puppeteer");
 const nodemailer = require("nodemailer");
-
+const puppeteercore = require("puppeteer-core");
+const chromium=require("@sparticuz/chromium-min")
 const productModel = require("./Schema/productSchema");
 const checkPriceDrop = async (product) => {
   try {
     console.log("Launching Puppeteer...");
 
-    const options = {
-      headless: true,
-      args: [
-        "--no-sandbox",
-        "--disable-setuid-sandbox",
-        "--disable-web-security",
-        "--hide-scrollbars",
-        "--font-render-hinting=none",
-      ],
-    };
+    let browser = null;
 
-    const browser = await puppeteer.launch(options);
+  if (process.env.NODE_ENV === 'development') {
+    Logger.log('Development browser: ');
+    browser = await puppeteer.launch({
+      args: ['--no-sandbox', '--disable-setuid-sandbox'],
+      headless: true,
+    });
+  }
+  if (process.env.NODE_ENV === 'production') {
+    Logger.log('Development production: ');
+    browser = await puppeteercore.launch({
+      args: chromium.args,
+      defaultViewport: chromium.defaultViewport,
+      executablePath: await chromium.executablePath(),
+      headless: chromium.headless,
+    });
+  }
     const page = await browser.newPage();
 
     const url = product.product_url;
