@@ -75,7 +75,9 @@
 // module.exports = { periodicCheck };
 
 const puppeteer = require("puppeteer");
+const nodemailer = require("nodemailer");
 
+const productModel = require("./Schema/productSchema");
 const checkPriceDrop = async (product) => {
   try {
     console.log("Launching Puppeteer...");
