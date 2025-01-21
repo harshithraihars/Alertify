@@ -74,15 +74,14 @@
 // };
 // module.exports = { periodicCheck };
 
-const nodemailer = require("nodemailer");
 const puppeteer = require("puppeteer");
-const productModel = require("./Schema/productSchema");
+
 const checkPriceDrop = async (product) => {
   try {
-    console.log("Launching Puppeteer......");
-    options = {
+    console.log("Launching Puppeteer...");
+
+    const options = {
       headless: true,
-      // executablePath: '/usr/bin/chromium-browser',
       args: [
         "--no-sandbox",
         "--disable-setuid-sandbox",
@@ -90,16 +89,18 @@ const checkPriceDrop = async (product) => {
         "--hide-scrollbars",
         "--font-render-hinting=none",
       ],
-    }
-    const browser = await puppeteer.launch(options);
+    };
 
+    const browser = await puppeteer.launch(options);
     const page = await browser.newPage();
+
     const url = product.product_url;
 
+    // Navigate to the product page
     await page.goto(url, { waitUntil: "domcontentloaded", timeout: 90000 });
 
     try {
-      const priceSelector = ".CxhGGd"; // Update the selector for your site
+      const priceSelector = ".CxhGGd"; // Update the selector for your target site
       await page.waitForSelector(priceSelector, { timeout: 20000 });
 
       const price = await page.$eval(priceSelector, (el) => el.innerText);
@@ -135,8 +136,8 @@ The Price Tracker Team`,
         };
 
         try {
-          const info = await transporter.sendMail(mailOptions);
-          console.log("Email sent successfully:");
+          await transporter.sendMail(mailOptions);
+          console.log("Email sent successfully.");
         } catch (emailError) {
           console.error("Error sending email:", emailError.message);
         }
@@ -153,7 +154,7 @@ The Price Tracker Team`,
 
 const periodicCheck = async () => {
   try {
-    console.log("Fetching products from database...");
+    console.log("Fetching products from the database...");
     const products = await productModel.find();
     for (const product of products) {
       await checkPriceDrop(product);
@@ -164,3 +165,4 @@ const periodicCheck = async () => {
 };
 
 module.exports = { periodicCheck };
+
