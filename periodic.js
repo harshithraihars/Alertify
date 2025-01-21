@@ -3,7 +3,7 @@
 // const chromium=require("@sparticuz/chromium-min")
 // const productModel = require("./Schema/productSchema");
 // const checkPriceDrop = (product) => {
-  
+
 //   (async () => {
 //     const islocal=process.env.CHROME_EXECUTABLE_PATH
 //     // connecting to the browser
@@ -13,7 +13,7 @@
 //       executablePath: process.env.CHROME_EXECUTABLE_PATH || await chromium.executablePath('https://my-media-assets.s3.amazonaws.com/chromium-v126.0.0-pack.tar'),
 //       headless: chromium.headless,
 //     });
-  
+
 //     const page = await browser.newPage();
 //     const url = product.product_url;
 
@@ -43,14 +43,14 @@
 //         to: "sigmaharshrai@gmail.com", // You can customize this to the user’s email
 //         subject: `Price Alert: ${product.product_name}`,
 //         text: `Hello,
-            
+
 //             The price of "${product.product_name}" has reached your desired limit!
-            
+
 //             Current Price: ₹${actual_price}
 //             Price Limit: ₹${product.price_limit}
-            
+
 //             Thank you for using our Price Tracker service.
-            
+
 //             Best regards,
 //             The Price Tracker Team`,
 //       };
@@ -74,84 +74,93 @@
 // };
 // module.exports = { periodicCheck };
 
-
-
 const nodemailer = require("nodemailer");
 const puppeteer = require("puppeteer");
 const productModel = require("./Schema/productSchema");
-const checkPriceDrop = (product) => {
-  
-  (async () => {
-    console.log("Chromium executable path:", puppeteer.executablePath());
-    // connecting to the browser
-    const executablePath = "/usr/bin/google-chrome-stable";
-    const browser = await puppeteer.launch({
+const checkPriceDrop = async (product) => {
+  try {
+    console.log("Launching Puppeteer......");
+    options = {
+      headless: true,
+      // executablePath: '/usr/bin/chromium-browser',
       args: [
-        "--disable-setuid-sandbox",
         "--no-sandbox",
-        "--single-process",
-        "--no-zygote"
+        "--disable-setuid-sandbox",
+        "--disable-web-security",
+        "--hide-scrollbars",
+        "--font-render-hinting=none",
       ],
-      // executablePath:puppeteer.executablePath()
-      executablePath:executablePath
-    });
-  
+    }
+    const browser = await puppeteer.launch(options);
+
     const page = await browser.newPage();
     const url = product.product_url;
 
-    await page.goto(url);
-    const priceSelector = ".CxhGGd";
-    const price = await page.$eval(priceSelector, (el) => el.innerText);
-    const actual_price = parseFloat(price.replace(/[₹,]/g, ""));
-    //   const imageSelector = '.jLEJ7H';
-    //   await page.waitForSelector(imageSelector);
+    await page.goto(url, { waitUntil: "domcontentloaded", timeout: 90000 });
 
-    // Get the 'src' attribute of the image
-    //   const imageSrc = await page.$eval(imageSelector, img => img.src);
-    console.log(
-      `The price of the product is ${actual_price}, limit price is ${product.price_limit}`
-    );
-    if (actual_price <= product.price_limit) {
-      const transporter = nodemailer.createTransport({
-        service: "gmail",
-        auth: {
-          user: process.env.EMAIL,
-          pass: process.env.PASSWORD,
-        },
-      });
+    try {
+      const priceSelector = ".CxhGGd"; // Update the selector for your site
+      await page.waitForSelector(priceSelector, { timeout: 20000 });
 
-      const mailOptions = {
-        from: process.env.EMAIL,
-        to: "sigmaharshrai@gmail.com", // You can customize this to the user’s email
-        subject: `Price Alert: ${product.product_name}`,
-        text: `Hello,
-            
-            The price of "${product.product_name}" has reached your desired limit!
-            
-            Current Price: ₹${actual_price}
-            Price Limit: ₹${product.price_limit}
-            
-            Thank you for using our Price Tracker service.
-            
-            Best regards,
-            The Price Tracker Team`,
-      };
+      const price = await page.$eval(priceSelector, (el) => el.innerText);
+      const actual_price = parseFloat(price.replace(/[₹,]/g, ""));
+      console.log(
+        `The price of the product is ₹${actual_price}, limit price is ₹${product.price_limit}`
+      );
 
-      try {
-        const info = await transporter.sendMail(mailOptions);
-      } catch (error) {
-        console.log("Error sending email:", error.message);
+      if (actual_price <= product.price_limit) {
+        const transporter = nodemailer.createTransport({
+          service: "gmail",
+          auth: {
+            user: process.env.EMAIL,
+            pass: process.env.PASSWORD,
+          },
+        });
+
+        const mailOptions = {
+          from: process.env.EMAIL,
+          to: "sigmaharshrai@gmail.com",
+          subject: `Price Alert: ${product.product_name}`,
+          text: `Hello,
+
+The price of "${product.product_name}" has reached your desired limit!
+
+Current Price: ₹${actual_price}
+Price Limit: ₹${product.price_limit}
+
+Thank you for using our Price Tracker service.
+
+Best regards,
+The Price Tracker Team`,
+        };
+
+        try {
+          const info = await transporter.sendMail(mailOptions);
+          console.log("Email sent successfully:");
+        } catch (emailError) {
+          console.error("Error sending email:", emailError.message);
+        }
       }
+    } catch (scrapingError) {
+      console.error("Error scraping price:", scrapingError.message);
     }
 
-    //   console.log(imageSrc)
     await browser.close();
-  })();
+  } catch (error) {
+    console.error("Error in checkPriceDrop:", error.message);
+  }
 };
+
 const periodicCheck = async () => {
-  const products = await productModel.find();
-  products.map((product) => {
-    checkPriceDrop(product);
-  });
+  try {
+    console.log("Fetching products from database...");
+    const products = await productModel.find();
+    for (const product of products) {
+      await checkPriceDrop(product);
+    }
+  } catch (error) {
+    console.error("Error fetching products:", error.message);
+  }
 };
+
 module.exports = { periodicCheck };
