@@ -50,7 +50,7 @@ const connectDb = require("./db/connectdb");
 const agenda = require("./Agenda/agenda"); // Agenda instance
 require("./Agenda/agendaJobSetup"); // Job definition
 const { enqueAllProducts } = require("./enqueueProducts");
-const getBrowser = require("./puppeterSingleTon");
+const getBrowser = require("./puppeterSingleton");
 
 const app = express();
 const PORT = process.env.PORT || 3000;
@@ -66,15 +66,10 @@ connectDb()
     console.log("Connected to MongoDB");
 
     // Start Agenda
-    agenda.on("ready", async () => {
-      console.log("agenda started");
-      
-      await agenda.start();
-      console.log("Agenda started");
+    await agenda.start();
+    console.log("✅ Agenda started");
 
-      // Enqueue all products once
-      await enqueAllProducts();
-    });
+    await enqueAllProducts();
 
     // Start Express server
     app.listen(PORT, () => {

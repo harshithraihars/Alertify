@@ -1,5 +1,5 @@
 const nodemailer = require("nodemailer");
-const getBrowser = require("./puppeterSingleTon");
+const getBrowser = require("./puppeterSingleton");
 
 const checkPriceDrop = async (product) => {
   try {
