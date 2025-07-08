@@ -4,7 +4,7 @@ const connectDb = () => {
   return new Promise(async (resolve, reject) => {
     try {
       await mongoose.connect(
-        "mongodb+srv://harshith:2005@nodeexpreeproject.5kniwxy.mongodb.net/flipkart-alert?retryWrites=true&w=majority&appName=nodeExpreeproject"
+        process.env.MONGO_URI
       );
       console.log("Connected to MongoDB successfully");
       resolve();
