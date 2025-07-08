@@ -67,7 +67,7 @@ connectDb()
 
     // Start Agenda
     await agenda.start();
-    console.log("✅ Agenda started");
+    console.log("Agenda started");
 
     await enqueAllProducts();
 
