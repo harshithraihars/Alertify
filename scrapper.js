@@ -65,7 +65,6 @@ connectDb()
   .then(async () => {
     console.log("Connected to MongoDB");
 
-    // Start Agenda
     await agenda.start();
     console.log("Agenda started");
 
