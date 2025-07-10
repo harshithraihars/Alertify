@@ -1,5 +1,6 @@
 const nodemailer = require("nodemailer");
-const getBrowser = require("./puppeterSingleton");
+const getBrowser = require("./puppeterSingleTon");
+const productModel = require("./Schema/productSchema");
 
 const checkPriceDrop = async (product) => {
   try {
@@ -34,7 +35,7 @@ const checkPriceDrop = async (product) => {
 
         const mailOptions = {
           from: process.env.EMAIL,
-          to: "sigmaharshrai@gmail.com",
+          to: product.userEmail,
           subject: `Price Alert: ${product.product_name}`,
           text: `Hello,
 
@@ -52,6 +53,9 @@ The Price Tracker Team`,
         try {
           await transporter.sendMail(mailOptions);
           console.log("Email sent successfully.");
+          await productModel.findOneAndDelete({ product_name:product.product_name });
+          console.log("product deleted succesfully");
+          
         } catch (emailError) {
           console.error("Error sending email:", emailError.message);
         }
@@ -59,8 +63,6 @@ The Price Tracker Team`,
     } catch (scrapingError) {
       console.error("Error scraping price:", scrapingError.message);
     }
-
-    await browser.close();
   } catch (error) {
     console.error("Error in checkPriceDrop:", error.message);
   }

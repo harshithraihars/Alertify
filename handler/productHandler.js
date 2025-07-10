@@ -2,10 +2,10 @@ const productModel = require("../Schema/productSchema")
 
 const createProduct=async (req,res)=>{
     try{
-        const {product_url,product_name,price_limit}=req.body
-        console.log(price_limit,product_url,product_name);
+        const {product_url,product_name,price_limit,userEmail}=req.body
+        console.log(price_limit,product_url,product_name,userEmail);
         
-    const newProduct=new productModel({product_url,product_name,price_limit})
+    const newProduct=new productModel({product_url,product_name,price_limit,userEmail})
     await newProduct.save()
     res.status(201).send({message:"Product Added to the que succefully"})
     }catch(err){

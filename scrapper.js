@@ -50,7 +50,7 @@ const connectDb = require("./db/connectdb");
 const agenda = require("./Agenda/agenda"); // Agenda instance
 require("./Agenda/agendaJobSetup"); // Job definition
 const { enqueAllProducts } = require("./enqueueProducts");
-const getBrowser = require("./puppeterSingleton");
+const getBrowser = require("./puppeterSingleTon");
 
 const app = express();
 const PORT = process.env.PORT || 3000;

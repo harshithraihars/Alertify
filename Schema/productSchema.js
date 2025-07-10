@@ -12,6 +12,10 @@ const productSchema = mongoose.Schema({
   price_limit: {
     type: Number,
     required: true
+  },
+  userEmail:{
+    type:String,
+    required:true
   }
 });
 
