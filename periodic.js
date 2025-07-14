@@ -6,8 +6,8 @@ const checkPriceDrop = async (product) => {
   try {
     console.log("Launching Puppeteer...");
 
-    const browser=await getBrowser();
-    
+    const browser = await getBrowser();
+
     const page = await browser.newPage();
 
     const url = product.product_url;
@@ -53,24 +53,30 @@ The Price Tracker Team`,
         try {
           await transporter.sendMail(mailOptions);
           console.log("Email sent successfully.");
-          await productModel.findOneAndDelete({ product_name:product.product_name });
+          await productModel.findOneAndDelete({
+            product_name: product.product_name,
+          });
           console.log("product deleted succesfully");
-          
         } catch (emailError) {
           console.error("Error sending email:", emailError.message);
         }
       }
     } catch (scrapingError) {
       console.error("Error scraping price:", scrapingError.message);
-    }
-    finally{
+    } finally {
       await page.close();
       console.log("page got closed");
-      
     }
   } catch (error) {
     console.error("Error in checkPriceDrop:", error.message);
   }
 };
 
-module.exports = { checkPriceDrop };
+
+const periodicCheck=async()=>{
+  const products = await productModel.find();
+    for (let product of products) {
+      await checkPriceDrop(product)
+    }
+}
+module.exports={periodicCheck}
