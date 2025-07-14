@@ -72,11 +72,14 @@ The Price Tracker Team`,
   }
 };
 
-
-const periodicCheck=async()=>{
-  const products = await productModel.find();
+const periodicCheck = async () => {
+  try {
+    const products = await productModel.find();
     for (let product of products) {
-      await checkPriceDrop(product)
+      await checkPriceDrop(product);
     }
-}
-module.exports={periodicCheck}
+  } catch (error) {
+    console.log(error.message);
+  }
+};
+module.exports = { periodicCheck };

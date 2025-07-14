@@ -40,6 +40,7 @@
 
 const express = require("express");
 const dotenv = require("dotenv");
+const cron = require("node-cron");
 const cors = require("cors");
 
 dotenv.config();
@@ -72,9 +73,12 @@ connectDb()
     // await enqueAllProducts();
 
     // Start Express server
-    await periodicCheck();
-    app.listen(PORT, () => {
+    app.listen(PORT, async () => {
       console.log(`Server listening on port ${PORT}`);
+      cron.schedule("0 */6 * * *", async () => {
+        console.log("🔁 Running price check every 6 hours...");
+        await periodicCheck();
+      });
     });
   })
   .catch((err) => {
