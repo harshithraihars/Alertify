@@ -63,6 +63,11 @@ The Price Tracker Team`,
     } catch (scrapingError) {
       console.error("Error scraping price:", scrapingError.message);
     }
+    finally{
+      await page.close();
+      console.log("page got closed");
+      
+    }
   } catch (error) {
     console.error("Error in checkPriceDrop:", error.message);
   }
